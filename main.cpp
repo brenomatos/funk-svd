@@ -5,7 +5,7 @@ using namespace std;
 class Matrix {
 private:
 
-
+  // add getters and setters (cleaner code)     
 public:
   int **m;
   int col;
