@@ -44,12 +44,36 @@ int main(int argc, char const *argv[]) {
   ratings.open(argv[1]);
   targets.open(argv[2]);
   string line; // needed to read line by line from each file
+  string user_id, item_id;
+  int prediction, timestamp;
 
-  if (targets.is_open())
+  //reading ratings file
+  if (ratings.is_open())
   {
-    while ( getline (targets,line) )
+    getline(ratings,line);
+    while ( getline (ratings,line) )
     {
-      cout << line << '\n';
+      user_id = line.substr(0,8);
+      item_id = line.substr(9,8);
+      if (line[19]!=',') {
+        prediction = stoi(line.substr(18,2));
+        timestamp = stoi(line.substr(21,line.size()-1));
+      }
+      else{
+        prediction = stoi(line.substr(18,1));
+        timestamp = stoi(line.substr(20,line.size()-1));
+      }
+      // cout << user_id << " " << item_id << " " <<  prediction << " "<< timestamp << endl;
+    }
+  }
+
+  // reading targets file
+  if (targets.is_open()) {
+    while (getline(targets, line)) {
+      cout << line << endl;
+      user_id = line.substr(0,8);
+      item_id = line.substr(9,8);
+      cout << user_id << " " << item_id << endl;
     }
   }
 
