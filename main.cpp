@@ -40,12 +40,14 @@ void Matrix::print_matrix(){
 }
 
 int main(int argc, char const *argv[]) {
+  (void)argc;
   ifstream ratings, targets;
   ratings.open(argv[1]);
   targets.open(argv[2]);
   string line; // needed to read line by line from each file
   string user_id, item_id;
   int prediction, timestamp;
+  map<string, map<string,int> > dense_users;
 
   //reading ratings file
   if (ratings.is_open())
@@ -63,7 +65,17 @@ int main(int argc, char const *argv[]) {
         prediction = stoi(line.substr(18,1));
         timestamp = stoi(line.substr(20,line.size()-1));
       }
-      // cout << user_id << " " << item_id << " " <<  prediction << " "<< timestamp << endl;
+      dense_users[user_id][item_id] = prediction;
+      // print the user map
+      cout << timestamp;
+
+      for(auto const &ent1 : dense_users) {
+        // ent1.first is the first key
+        for(auto const &ent2 : ent1.second) {
+          cout << ent1.first << " "<< ent2.first << " "<< ent2.second<<endl;
+        }
+      }
+
     }
   }
 
