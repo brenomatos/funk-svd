@@ -3,31 +3,57 @@ using namespace std;
 
 class Matrix {
 private:
-
-  // add getters and setters (cleaner code)
-public:
   int **m;
   int col;
   int row;
+public:
+
   Matrix (int col, int row);
   ~Matrix ();
+  void set_col(int col);
+  void set_row(int row);
+  int get_col();
+  int get_row();
   void print_matrix();
+  void set_value(int i, int j, int value);
 };
 
 Matrix::Matrix(int col, int row){
-  m = (int**) malloc (row * sizeof(int*));
-  for (int i = 0; i < row; i++) {
-    m[i] = (int*) malloc (col * sizeof(int));
+  this->set_col(col);
+  this->set_row(row);
+
+  this->m = (int**) malloc (this->get_row() * sizeof(int*));
+  for (int i = 0; i < this->get_row(); i++) {
+    this->m[i] = (int*) malloc (this->get_col() * sizeof(int));
   }
-  this->col = col;
-  this->row = row;
+
 }
 
 Matrix::~Matrix(){
-  for (int i = 0; i < this->row; i++) {
-    free(m[i]);
+  for (int i = 0; i < this->get_row(); i++) {
+    free(this->m[i]);
   }
-  free(m);
+  free(this->m);
+}
+
+void Matrix::set_value(int i, int j,int value){
+  this->m[i][j] = value;
+}
+
+int Matrix::get_col(){
+  return this->col;
+}
+
+int Matrix::get_row(){
+  return this->row;
+}
+
+void Matrix::set_col(int col){
+  this->col = col;
+}
+
+void Matrix::set_row(int row){
+  this->row = row;
 }
 
 void Matrix::print_matrix(){
@@ -39,21 +65,31 @@ void Matrix::print_matrix(){
   }
 }
 
-int main(int argc, char const *argv[]) {
-  (void)argc;
-  ifstream ratings, targets;
-  ratings.open(argv[1]);
-  targets.open(argv[2]);
+void print_input(map<string, map<string,int> > * dense_users){
+  for(auto const &ent1 : (*dense_users)) {
+    // ent1.first is the first key
+    for(auto const &ent2 : ent1.second) {
+      cout << ent1.first << " "<< ent2.first << " "<< ent2.second<<endl;
+    }
+  }
+}
+
+void print_output(map<string, string> * targets){
+  for(auto elem : (*targets))
+  {
+    std::cout << elem.first << " " << elem.second << " " << "\n";
+  }
+}
+
+void read_ratings(map<string, map<string,int> > * dense_users, ifstream* input_ratings){
+  // reading ratings file
   string line; // needed to read line by line from each file
   string user_id, item_id;
   int prediction, timestamp;
-  map<string, map<string,int> > dense_users;
-
-  //reading ratings file
-  if (ratings.is_open())
+  if (input_ratings->is_open())
   {
-    getline(ratings,line);
-    while ( getline (ratings,line) )
+    getline(*input_ratings,line);
+    while ( getline (*input_ratings,line) )
     {
       user_id = line.substr(0,8);
       item_id = line.substr(9,8);
@@ -65,40 +101,49 @@ int main(int argc, char const *argv[]) {
         prediction = stoi(line.substr(18,1));
         timestamp = stoi(line.substr(20,line.size()-1));
       }
-      dense_users[user_id][item_id] = prediction;
-      // print the user map
-      cout << timestamp;
-
-      for(auto const &ent1 : dense_users) {
-        // ent1.first is the first key
-        for(auto const &ent2 : ent1.second) {
-          cout << ent1.first << " "<< ent2.first << " "<< ent2.second<<endl;
-        }
-      }
+      (*dense_users)[user_id][item_id] = prediction;
+      (void) timestamp;
 
     }
   }
+}
 
+void read_targets(map<string, string> * targets,ifstream* input_targets ){
+  string user_id, item_id, line;
   // reading targets file
-  if (targets.is_open()) {
-    while (getline(targets, line)) {
-      cout << line << endl;
+  if (input_targets->is_open()) {
+    while (getline(*input_targets, line)) {
       user_id = line.substr(0,8);
       item_id = line.substr(9,8);
-      cout << user_id << " " << item_id << endl;
+      (*targets)[user_id] = item_id;
     }
   }
+}
 
+int main(int argc, char const *argv[]) {
+  (void)argc;
+  ifstream input_ratings, input_targets;
+  input_ratings.open(argv[1]);
+  input_targets.open(argv[2]);
+
+  map<string, map<string,int> > dense_users;
+  map<string, string> targets;
+
+  read_ratings( &dense_users, &input_ratings);
+  read_targets( &targets, &input_targets);
+  print_input(&dense_users);
+  print_output(&targets);
+  
   Matrix matriz = Matrix(3,3);
-  for (int i = 0; i < matriz.col; i++) {
-    for (int j = 0; j < matriz.row; j++) {
-      matriz.m[i][j] = i+j;
+  for (int i = 0; i < matriz.get_col(); i++) {
+    for (int j = 0; j < matriz.get_row(); j++) {
+      matriz.set_value(i,j,i+j);
     }
   }
   matriz.print_matrix();
 
 
-  ratings.close();
-  targets.close();
+  input_ratings.close();
+  input_targets.close();
   return 0;
 }
