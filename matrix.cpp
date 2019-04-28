@@ -1,19 +1,57 @@
+#ifndef MATRIX_H
+#define MATRIX_H
+
+
 #include <bits/stdc++.h>
+#include "matrix.h"
 using namespace std;
 
-class Matrix {
-private:
-  int **m;
-  int col;
-  int row;
-public:
 
-  Matrix (int col, int row);
-  ~Matrix ();
-  void set_col(int col);
-  void set_row(int row);
-  int get_col();
-  int get_row();
-  void print_matrix();
-  void set_value(int i, int j, int value);
-};
+Matrix::Matrix(int col, int row){
+  this->set_col(col);
+  this->set_row(row);
+
+  this->m = (int**) malloc (this->get_row() * sizeof(int*));
+  for (int i = 0; i < this->get_row(); i++) {
+    this->m[i] = (int*) malloc (this->get_col() * sizeof(int));
+  }
+
+}
+
+Matrix::~Matrix(){
+  for (int i = 0; i < this->get_row(); i++) {
+    free(this->m[i]);
+  }
+  free(this->m);
+}
+
+void Matrix::set_value(int i, int j,int value){
+  this->m[i][j] = value;
+}
+
+int Matrix::get_col(){
+  return this->col;
+}
+
+int Matrix::get_row(){
+  return this->row;
+}
+
+void Matrix::set_col(int col){
+  this->col = col;
+}
+
+void Matrix::set_row(int row){
+  this->row = row;
+}
+
+void Matrix::print_matrix(){
+  for (int i = 0; i < this->row; i++) {
+    for (int j = 0; j < this->col; j++) {
+      cout << this->m[i][j] << " ";
+    }
+    cout << endl;
+  }
+}
+
+#endif

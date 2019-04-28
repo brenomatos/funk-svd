@@ -1,8 +1,9 @@
 #include <bits/stdc++.h>
 #include "matrix.h"
+#include "svd.h"
 using namespace std;
 
-
+class Matrix;
 
 void print_input(map<string, map<string,int> > * dense_users){
   for(auto const &ent1 : (*dense_users)) {
@@ -70,17 +71,11 @@ int main(int argc, char const *argv[]) {
 
   read_ratings( &dense_users, &input_ratings);
   read_targets( &targets, &input_targets);
-  print_input(&dense_users);
-  print_output(&targets);
+  // print_input(&dense_users);
+  // print_output(&targets);
 
-  Matrix matriz = Matrix(3,3);
-  for (int i = 0; i < matriz.get_col(); i++) {
-    for (int j = 0; j < matriz.get_row(); j++) {
-      matriz.set_value(i,j,i+j);
-    }
-  }
-  matriz.print_matrix();
-
+  Svd svd = Svd(20);
+  svd.print_svd();
 
   input_ratings.close();
   input_targets.close();
