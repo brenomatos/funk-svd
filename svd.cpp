@@ -78,10 +78,11 @@ void Svd::read_targets(ifstream* input_targets ){
 Svd::Svd(int k, float learning_rate, float reg, ifstream* input_ratings, ifstream* input_targets ){
   this->read_ratings(input_ratings);
   this->read_targets(input_targets);
-  cout << this->user_index.size() << " " <<  this->item_index.size() << endl;
+  this->factors = k;
+  this->learning_rate = learning_rate;
+  this->reg = reg;
   p = new Matrix(this->user_index.size(), k);
   q = new Matrix(k, this->item_index.size());
-  this->factors = k;
   for (int i = 0; i < p->get_row(); i++) {
     for (int j = 0; j < p->get_col(); j++) {
       p->set_value(i,j,1);
@@ -109,6 +110,12 @@ int Svd::predict(int user, int item){
   return prediction;
 }
 
+void train_model(int epochs){
+  
+}
+void submission(){
+
+}
 void Svd::print_svd(){
   p->print_matrix();
   cout << endl ;

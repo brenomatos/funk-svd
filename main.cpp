@@ -24,11 +24,9 @@ int main(int argc, char const *argv[]) {
   input_targets.open(argv[2]);
 
   Svd svd = Svd(20,0.05,0.5,&input_ratings,&input_targets);
-  // svd.print_svd();
+
   int result = svd.predict(0,0);
-  svd.print_ratings();
-  svd.print_targets();
-  cout << "resultado " << result << endl;
+
   input_ratings.close();
   input_targets.close();
   return 0;
