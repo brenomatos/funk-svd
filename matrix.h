@@ -12,7 +12,7 @@ protected:
   int row;
 public:
 
-  Matrix (int col, int row);
+  Matrix (int row, int col);
   ~Matrix ();
   void set_col(int col);
   void set_row(int row);
@@ -20,6 +20,7 @@ public:
   int get_row();
   void print_matrix();
   void set_value(int i, int j, int value);
+  int get_value(int i,int j);
 };
 
 #endif

@@ -7,7 +7,7 @@
 using namespace std;
 
 
-Matrix::Matrix(int col, int row){
+Matrix::Matrix(int row, int col){
   this->set_col(col);
   this->set_row(row);
 
@@ -29,6 +29,9 @@ void Matrix::set_value(int i, int j,int value){
   this->m[i][j] = value;
 }
 
+int Matrix::get_value(int i, int j){
+  return this->m[i][j];
+}
 int Matrix::get_col(){
   return this->col;
 }

@@ -11,11 +11,12 @@ class Svd{
 private:
   Matrix* q;
   Matrix* p;
-  
+  int factors;
 public:
 
-  Svd (int k);
+  Svd (int k, float learning_rate, float reg, int n_users, int n_items);
   ~Svd ();
+  int predict(int user, int item);//for a pair user:item, predicts a rating
   void print_svd();
 
 };

@@ -71,12 +71,13 @@ int main(int argc, char const *argv[]) {
 
   read_ratings( &dense_users, &input_ratings);
   read_targets( &targets, &input_targets);
-  // print_input(&dense_users);
-  // print_output(&targets);
+  print_input(&dense_users);
+  print_output(&targets);
 
-  Svd svd = Svd(20);
+  Svd svd = Svd(20,0.05,0.5,100,10);
   svd.print_svd();
-
+  int result = svd.predict(0,0);
+  cout << "resultado " << result << endl;
   input_ratings.close();
   input_targets.close();
   return 0;
