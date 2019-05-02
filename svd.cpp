@@ -83,7 +83,7 @@ Svd::Svd(int k, double learning_rate, double reg, ifstream* input_ratings){
   this->reg = reg;
   p = new Matrix(this->user_index.size(), k);
   q = new Matrix(k, this->item_index.size());
-  // both p and q star with all 1s
+  // both p and q star with random numbers following a normal distribuition
 
   default_random_engine generator(23);
   normal_distribution<double> distribution(0.0,1.0);
@@ -130,13 +130,10 @@ void Svd::train_model(int epochs){
 	      	i_id =  ent2.first;
 	      	rtng = ent2.second;
 	      	// calculating prediction error
-	      	// cout << this->user_index[u_id] << " " << this->item_index[i_id]<<endl;
 	      	error =  this->dense_users[u_id][i_id] - predict(this->user_index[u_id],this->item_index[i_id]);
-	      	// cout << p->get_value(this->user_index[u_id],11) << " " << q->get_value(11,this->item_index[i_id]) << endl;
 	      	// updating vectors
 	    	for (int i = 0; i < this->factors; i++) {
 	    		q->set_value(i,item_index[i_id], q->get_value(i,item_index[i_id]) + this->learning_rate*(error * p->get_value(user_index[u_id],i) - this->reg * q->get_value(i,item_index[i_id])));
-    			// cout << "depois " <<  q->get_value(i,item_index[i_id]) << endl;
     			p->set_value(user_index[u_id],i, p->get_value(user_index[u_id],i) + this->learning_rate*(error * q->get_value(i,item_index[i_id]) - this->reg * p->get_value(user_index[u_id],i)));
   			}
     	}
@@ -154,6 +151,11 @@ void Svd::submission(ifstream* input_targets ){
       user_id = line.substr(0,8);
       item_id = line.substr(9,8);
       double answer = predict(user_index[user_id],item_index[item_id]);
+      if (this->user_index.count(user_id)==0 || this->item_index.count(item_id)==0 )
+      {
+        // cout << "esse caso ocorreu" << endl;
+        answer = 7.2;
+      }
       if (answer>10)
         {
           answer=10;
