@@ -11,9 +11,9 @@ Matrix::Matrix(int row, int col){
   this->set_col(col);
   this->set_row(row);
 
-  this->m = (float**) malloc (this->get_row() * sizeof(float*));
+  this->m = (double**) malloc (this->get_row() * sizeof(double*));
   for (int i = 0; i < this->get_row(); i++) {
-    this->m[i] = (float*) malloc (this->get_col() * sizeof(float));
+    this->m[i] = (double*) malloc (this->get_col() * sizeof(double));
   }
 
 }
@@ -25,11 +25,11 @@ Matrix::~Matrix(){
   free(this->m);
 }
 
-void Matrix::set_value(int i, int j,float value){
+void Matrix::set_value(int i, int j,double value){
   this->m[i][j] = value;
 }
 
-float Matrix::get_value(int i, int j){
+double Matrix::get_value(int i, int j){
   return this->m[i][j];
 }
 int Matrix::get_col(){

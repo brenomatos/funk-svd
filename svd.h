@@ -12,15 +12,15 @@ private:
   Matrix* q;
   Matrix* p;
   int factors;
-  float learning_rate, reg;
-  map<string, map<string,int> > dense_users;
-  map<string, string> targets;
+  double learning_rate, reg;
+  unordered_map<string, unordered_map<string,int> > dense_users;
+  unordered_map<string, string> targets;
   // 2 dicts below keep track of user index in matrix p and item index in matrix q
-  map<string,int> user_index;
-  map<string,int> item_index;
+  unordered_map<string,int> user_index;
+  unordered_map<string,int> item_index;
 public:
 
-  Svd (int k, float learning_rate, float reg, ifstream* input_targets, ifstream* input_ratings);
+  Svd (int k, double learning_rate, double reg, ifstream* input_targets, ifstream* input_ratings);
   ~Svd ();
   void read_targets(ifstream* input_targets );
   void read_ratings(ifstream* input_ratings);

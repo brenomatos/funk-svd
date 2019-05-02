@@ -7,7 +7,7 @@ using namespace std;
 
 class Matrix {
 protected:
-  float **m;
+  double **m;
   int col;
   int row;
 public:
@@ -19,8 +19,8 @@ public:
   int get_col();
   int get_row();
   void print_matrix();
-  void set_value(int i, int j, float value);
-  float get_value(int i,int j);
+  void set_value(int i, int j, double value);
+  double get_value(int i,int j);
 };
 
 #endif

@@ -75,7 +75,7 @@ void Svd::read_targets(ifstream* input_targets ){
   }
 }
 
-Svd::Svd(int k, float learning_rate, float reg, ifstream* input_ratings, ifstream* input_targets ){
+Svd::Svd(int k, double learning_rate, double reg, ifstream* input_ratings, ifstream* input_targets ){
   this->read_ratings(input_ratings);
   this->read_targets(input_targets);
   this->factors = k;
@@ -113,8 +113,8 @@ int Svd::predict(int user, int item){
 
 void Svd::train_model(int epochs){
 	string u_id,i_id; // user and item ids
-	float rtng;
-	float error;
+	double rtng;
+	double error;
   for (int e = 0; e < epochs; e++)
   {
   	for(auto const &ent1 : (this->dense_users)) {
