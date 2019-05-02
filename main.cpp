@@ -23,9 +23,10 @@ int main(int argc, char const *argv[]) {
   input_ratings.open(argv[1]);
   input_targets.open(argv[2]);
 
-  Svd svd = Svd(20,0.05,0.5,&input_ratings,&input_targets);
-
-  int result = svd.predict(0,0);
+  Svd svd = Svd(30,0.05,0.1,&input_ratings,&input_targets);
+  // svd.print_svd();
+  svd.train_model(30);
+  svd.print_svd();
 
   input_ratings.close();
   input_targets.close();

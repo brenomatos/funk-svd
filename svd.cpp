@@ -83,20 +83,21 @@ Svd::Svd(int k, float learning_rate, float reg, ifstream* input_ratings, ifstrea
   this->reg = reg;
   p = new Matrix(this->user_index.size(), k);
   q = new Matrix(k, this->item_index.size());
+  // both p and q star with all 1s
   for (int i = 0; i < p->get_row(); i++) {
     for (int j = 0; j < p->get_col(); j++) {
-      p->set_value(i,j,1);
+      p->set_value(i,j,1.0);
     }
   }
 
   for (int i = 0; i < q->get_row(); i++) {
     for (int j = 0; j < q->get_col(); j++) {
-      q->set_value(i,j,1);
+      q->set_value(i,j,1.0);
     }
   }
 
 }
-
+									
 Svd::~Svd(){
   delete q;
   delete p;
@@ -110,9 +111,34 @@ int Svd::predict(int user, int item){
   return prediction;
 }
 
-void train_model(int epochs){
-  
+void Svd::train_model(int epochs){
+	string u_id,i_id; // user and item ids
+	float rtng;
+	float error;
+  for (int e = 0; e < epochs; e++)
+  {
+  	for(auto const &ent1 : (this->dense_users)) {
+    	// ent1.first is the first key
+    	for(auto const &ent2 : ent1.second) {
+	      	u_id = ent1.first;
+	      	i_id =  ent2.first;
+	      	rtng = ent2.second;
+	      	// calculating prediction error
+	      	// cout << this->user_index[u_id] << " " << this->item_index[i_id]<<endl;
+	      	// error =  this->dense_users[u_id][i_id] - predict(this->user_index[u_id],this->item_index[i_id]);
+	      	// cout << p->get_value(this->user_index[u_id],11) << " " << q->get_value(11,this->item_index[i_id]) << endl;
+	      	// updating vectors
+	    	for (int i = 0; i < this->factors; i++) {
+	    		// cout << "antes " <<  q->get_value(i,item_index[i_id]) << endl;
+	    		q->set_value(i,item_index[i_id], q->get_value(i,item_index[i_id]) + this->learning_rate*(error * p->get_value(user_index[u_id],i) - this->reg * q->get_value(i,item_index[i_id])));
+    			// cout << "depois " <<  q->get_value(i,item_index[i_id]) << endl;
+    			p->set_value(user_index[u_id],i, p->get_value(user_index[u_id],i) + this->learning_rate*(error * q->get_value(i,item_index[i_id]) - this->reg * p->get_value(user_index[u_id],i)));
+  			}
+    	}
+  	}
 }
+}
+
 void submission(){
 
 }
