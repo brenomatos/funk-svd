@@ -139,19 +139,28 @@ void Svd::train_model(int epochs){
 }
 }
 
-void Svd::submission(){
-  string u_id, i_id; //user and item id
-  // cout << "UserId:ItemId,Prediction\n";
-  for(auto elem : this->targets)
-  {
-    u_id = elem.first;
-    i_id = elem.second;
-    double answer = predict(user_index[u_id],item_index[i_id]);
-    
-    cout << elem.first << ":" << elem.second <<","<<answer << endl;
-
+void Svd::submission(ifstream* input_targets ){
+  string user_id, item_id, line;
+  // reading targets file
+  cout<< "UserId:ItemId,Prediction\n";
+  if (input_targets->is_open()) {
+    getline(*input_targets, line);
+    while (getline(*input_targets, line)) {
+      user_id = line.substr(0,8);
+      item_id = line.substr(9,8);
+      double answer = predict(user_index[user_id],item_index[item_id]);
+      if (answer>10)
+        {
+          answer=10;
+        }  
+      if (answer<0)
+      {
+        answer=0;
+      }
+      cout << user_id << ":" << item_id<<","<<answer << endl;
+      (this->targets)[user_id] = item_id;
+    }
   }
-
 }
 
 void Svd::print_svd(){

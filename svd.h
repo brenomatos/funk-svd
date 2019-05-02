@@ -28,7 +28,7 @@ public:
   void print_targets();
   void train_model(int epochs);
   double predict(int user, int item);//for a pair user:item, predicts a rating
-  void submission();
+  void submission(ifstream* input_targets );
   void print_svd();
 
 };
