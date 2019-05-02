@@ -103,8 +103,8 @@ Svd::~Svd(){
   delete p;
 }
 
-int Svd::predict(int user, int item){
-  int prediction = 0;
+double Svd::predict(int user, int item){
+  double prediction = 0;
   for (int i = 0; i < this->factors; i++) {
     prediction += p->get_value(user,i) * q->get_value(i,item);
   }
@@ -139,9 +139,21 @@ void Svd::train_model(int epochs){
 }
 }
 
-void submission(){
+void Svd::submission(){
+  string u_id, i_id; //user and item id
+  // cout << "UserId:ItemId,Prediction\n";
+  for(auto elem : this->targets)
+  {
+    u_id = elem.first;
+    i_id = elem.second;
+    double answer = predict(user_index[u_id],item_index[i_id]);
+    
+    cout << elem.first << ":" << elem.second <<","<<answer << endl;
+
+  }
 
 }
+
 void Svd::print_svd(){
   p->print_matrix();
   cout << endl ;

@@ -15,7 +15,8 @@ int main(int argc, char const *argv[]) {
   Svd svd = Svd(30,0.05,0.1,&input_ratings,&input_targets);
   // svd.print_svd();
   svd.train_model(10);
-  svd.print_svd();
+  // svd.print_svd();
+  svd.submission();
 
   input_ratings.close();
   input_targets.close();
