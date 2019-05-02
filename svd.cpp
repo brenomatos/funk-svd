@@ -75,24 +75,30 @@ void Svd::read_targets(ifstream* input_targets ){
   }
 }
 
-Svd::Svd(int k, double learning_rate, double reg, ifstream* input_ratings, ifstream* input_targets ){
+Svd::Svd(int k, double learning_rate, double reg, ifstream* input_ratings){
   this->read_ratings(input_ratings);
-  this->read_targets(input_targets);
+  // this->read_targets(input_targets);
   this->factors = k;
   this->learning_rate = learning_rate;
   this->reg = reg;
   p = new Matrix(this->user_index.size(), k);
   q = new Matrix(k, this->item_index.size());
   // both p and q star with all 1s
+
+  default_random_engine generator(23);
+  normal_distribution<double> distribution(0.0,1.0);
+
   for (int i = 0; i < p->get_row(); i++) {
     for (int j = 0; j < p->get_col(); j++) {
-      p->set_value(i,j,1.0);
+      double rnd = distribution(generator);
+      p->set_value(i,j,rnd);
     }
   }
 
   for (int i = 0; i < q->get_row(); i++) {
     for (int j = 0; j < q->get_col(); j++) {
-      q->set_value(i,j,1.0);
+      double rnd = distribution(generator);
+      q->set_value(i,j,rnd);
     }
   }
 
@@ -125,11 +131,10 @@ void Svd::train_model(int epochs){
 	      	rtng = ent2.second;
 	      	// calculating prediction error
 	      	// cout << this->user_index[u_id] << " " << this->item_index[i_id]<<endl;
-	      	// error =  this->dense_users[u_id][i_id] - predict(this->user_index[u_id],this->item_index[i_id]);
+	      	error =  this->dense_users[u_id][i_id] - predict(this->user_index[u_id],this->item_index[i_id]);
 	      	// cout << p->get_value(this->user_index[u_id],11) << " " << q->get_value(11,this->item_index[i_id]) << endl;
 	      	// updating vectors
 	    	for (int i = 0; i < this->factors; i++) {
-	    		// cout << "antes " <<  q->get_value(i,item_index[i_id]) << endl;
 	    		q->set_value(i,item_index[i_id], q->get_value(i,item_index[i_id]) + this->learning_rate*(error * p->get_value(user_index[u_id],i) - this->reg * q->get_value(i,item_index[i_id])));
     			// cout << "depois " <<  q->get_value(i,item_index[i_id]) << endl;
     			p->set_value(user_index[u_id],i, p->get_value(user_index[u_id],i) + this->learning_rate*(error * q->get_value(i,item_index[i_id]) - this->reg * p->get_value(user_index[u_id],i)));

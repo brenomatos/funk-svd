@@ -20,7 +20,7 @@ private:
   unordered_map<string,int> item_index;
 public:
 
-  Svd (int k, double learning_rate, double reg, ifstream* input_targets, ifstream* input_ratings);
+  Svd (int k, double learning_rate, double reg, ifstream* input_ratings);
   ~Svd ();
   void read_targets(ifstream* input_targets );
   void read_ratings(ifstream* input_ratings);

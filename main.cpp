@@ -12,10 +12,9 @@ int main(int argc, char const *argv[]) {
   input_ratings.open(argv[1]);
   input_targets.open(argv[2]);
 
-  Svd svd = Svd(30,0.005,0.1,&input_ratings,&input_targets);
-  // svd.print_svd();
+  Svd svd = Svd(70,0.005,0.1,&input_ratings);
   svd.train_model(50);
-  // svd.print_svd();
+
   input_targets.close();
   input_targets.open(argv[2]);
   svd.submission(&input_targets);
