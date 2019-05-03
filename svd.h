@@ -11,6 +11,7 @@ private:
   Matrix* q;
   Matrix* p;
   int factors;
+  int epochs;
   double learning_rate, reg;
   unordered_map<string, unordered_map<string,int> > dense_users;
   unordered_map<string, string> targets;
@@ -19,13 +20,13 @@ private:
   unordered_map<string,int> item_index;
 public:
 
-  Svd (int k, double learning_rate, double reg, ifstream* input_ratings);
+  Svd (int k, double learning_rate, double reg, int epochs, ifstream* input_ratings);
   ~Svd ();
   void read_targets(ifstream* input_targets );
   void read_ratings(ifstream* input_ratings);
   void print_ratings();
   void print_targets();
-  void train_model(int epochs);
+  void train_model();
   double predict(int user, int item);//for a pair user:item, predicts a rating
   void submission(ifstream* input_targets );
   void print_svd();

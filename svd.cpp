@@ -74,12 +74,13 @@ void Svd::read_targets(ifstream* input_targets ){
   }
 }
 
-Svd::Svd(int k, double learning_rate, double reg, ifstream* input_ratings){
+Svd::Svd(int k, double learning_rate, double reg, int epochs, ifstream* input_ratings){
   this->read_ratings(input_ratings);
   // this->read_targets(input_targets);
   this->factors = k;
   this->learning_rate = learning_rate;
   this->reg = reg;
+  this->epochs = epochs;
   p = new Matrix(this->user_index.size(), k);
   q = new Matrix(k, this->item_index.size());
   // both p and q star with random numbers following a normal distribuition
@@ -116,11 +117,11 @@ double Svd::predict(int user, int item){
   return prediction;
 }
 
-void Svd::train_model(int epochs){
+void Svd::train_model(){
 	string u_id,i_id; // user and item ids
 	double rtng;
 	double error;
-  for (int e = 0; e < epochs; e++)
+  for (int e = 0; e < this->epochs; e++)
   {
   	for(auto const &ent1 : (this->dense_users)) {
     	// ent1.first is the first key
