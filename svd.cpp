@@ -39,12 +39,12 @@ void Svd::read_ratings(ifstream* input_ratings){
       user_id = line.substr(0,8);
       item_id = line.substr(9,8);
       // dict that keeps track of user index in p matrix
-      if ((this->user_index).count(user_id)==0) {
+      if ((this->user_index).find(user_id)==this->user_index.end()) {
         (this->user_index)[user_id] = index_user;
         index_user++;
       }
       // dict that keeps track of item index in q matrix
-      if ((this->item_index).count(item_id)==0) {
+      if ((this->item_index).find(item_id)==this->item_index.end()) {
         (this->item_index)[item_id] = index_item;
         index_item++;
       }
@@ -82,11 +82,11 @@ Svd::Svd(int k, double learning_rate, double reg, int epochs, ifstream* input_ra
   this->reg = reg;
   this->epochs = epochs;
   p = new Matrix(this->user_index.size(), k);
-  q = new Matrix(k, this->item_index.size());
+  q = new Matrix(this->item_index.size(), k);
   // both p and q star with random numbers following a normal distribuition
 
   default_random_engine generator(23);
-  normal_distribution<double> distribution(0.0,1.0);
+  normal_distribution<double> distribution(0.0,0.01);
 
   for (int i = 0; i < p->get_row(); i++) {
     for (int j = 0; j < p->get_col(); j++) {
@@ -112,7 +112,7 @@ Svd::~Svd(){
 double Svd::predict(int user, int item){
   double prediction = 0;
   for (int i = 0; i < this->factors; i++) {
-    prediction += p->get_value(user,i) * q->get_value(i,item);
+    prediction += p->get_value(user,i) * q->get_value(item,i);
   }
   return prediction;
 }
@@ -121,8 +121,11 @@ void Svd::train_model(){
 	string u_id,i_id; // user and item ids
 	double rtng;
 	double error;
+  double q_correction, p_correction;
   for (int e = 0; e < this->epochs; e++)
   {
+    double rmse = 0;
+  int sum = 0;
   	for(auto const &ent1 : (this->dense_users)) {
     	// ent1.first is the first key
     	for(auto const &ent2 : ent1.second) {
@@ -131,13 +134,20 @@ void Svd::train_model(){
 	      	rtng = ent2.second;
 	      	// calculating prediction error
 	      	error =  this->dense_users[u_id][i_id] - predict(this->user_index[u_id],this->item_index[i_id]);
+          rmse+=(error*error);
+          sum+=1;
 	      	// updating vectors
 	    	for (int i = 0; i < this->factors; i++) {
-	    		q->set_value(i,item_index[i_id], q->get_value(i,item_index[i_id]) + this->learning_rate*(error * p->get_value(user_index[u_id],i) - this->reg * q->get_value(i,item_index[i_id])));
-    			p->set_value(user_index[u_id],i, p->get_value(user_index[u_id],i) + this->learning_rate*(error * q->get_value(i,item_index[i_id]) - this->reg * p->get_value(user_index[u_id],i)));
+          q_correction = 2*this->learning_rate*(error * p->get_value(user_index[u_id],i));
+          p_correction = 2*this->learning_rate*(error * q->get_value(item_index[i_id],i));
+	    		q->set_value(item_index[i_id],i, q->get_value(item_index[i_id],i) + q_correction);
+    			p->set_value(user_index[u_id],i, p->get_value(user_index[u_id],i) + p_correction);
   			}
     	}
   	}
+    rmse/=sum ;
+    // cout << "epoca "<< e << " "<< sqrt(rmse) << endl;
+    
 }
 }
 
@@ -151,17 +161,17 @@ void Svd::submission(ifstream* input_targets ){
       user_id = line.substr(0,8);
       item_id = line.substr(9,8);
       double answer = predict(user_index[user_id],item_index[item_id]);
-      if (this->user_index.count(user_id)==0 || this->item_index.count(item_id)==0 )
+      if (this->user_index.find(user_id)==this->user_index.end() || this->item_index.find(item_id)==this->item_index.end() )
       {
         answer = 7.2;
       }
       if (answer>10)
         {
-          answer=10;
+          answer=10.0;
         }
       if (answer<0)
       {
-        answer=0;
+        answer=0.0;
       }
       cout << user_id << ":" << item_id<<","<<answer << endl;
       (this->targets)[user_id] = item_id;

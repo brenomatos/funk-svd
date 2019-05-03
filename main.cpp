@@ -5,7 +5,7 @@ using namespace std;
 
 class Matrix;
 
-// params 30,0.008,0.8 epochs 60
+// params 50,0.005,0.8 epochs 73
 // como checar se uma chave existe de forma eficiente?
 int main(int argc, char const *argv[]) {
   (void)argc;
@@ -13,10 +13,11 @@ int main(int argc, char const *argv[]) {
   input_ratings.open(argv[1]);
   input_targets.open(argv[2]);
 
-  int k=30; // # of factors
-  double learning_rate=0.008;
+  int k=50; // # of factors
+  double learning_rate=0.005;
   double reg=0.8;
-  int epochs = 60;
+  int epochs = 73;
+
   Svd svd = Svd(k,learning_rate,reg,epochs,&input_ratings);
   svd.train_model();
   svd.submission(&input_targets);
