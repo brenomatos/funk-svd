@@ -2,7 +2,6 @@
 #define SVD_H
 
 #include <bits/stdc++.h>
-// #include "svd.h"
 
 using namespace std;
 class Matrix;

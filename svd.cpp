@@ -23,7 +23,6 @@ void Svd::print_targets(){
   {
     std::cout << elem.first << " " << elem.second << " " << "\n";
   }
-  cout << "OUTPUT TERMINADO" << endl;
 }
 
 void Svd::read_ratings(ifstream* input_ratings){
@@ -103,7 +102,7 @@ Svd::Svd(int k, double learning_rate, double reg, ifstream* input_ratings){
   }
 
 }
-									
+
 Svd::~Svd(){
   delete q;
   delete p;
@@ -153,13 +152,12 @@ void Svd::submission(ifstream* input_targets ){
       double answer = predict(user_index[user_id],item_index[item_id]);
       if (this->user_index.count(user_id)==0 || this->item_index.count(item_id)==0 )
       {
-        // cout << "esse caso ocorreu" << endl;
         answer = 7.2;
       }
       if (answer>10)
         {
           answer=10;
-        }  
+        }
       if (answer<0)
       {
         answer=0;
