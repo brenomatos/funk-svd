@@ -85,19 +85,19 @@ Svd::Svd(int k, double learning_rate, double reg, int epochs, ifstream* input_ra
   q = new Matrix(this->item_index.size(), k);
   // both p and q star with random numbers following a normal distribuition
 
-  default_random_engine generator(23);
-  normal_distribution<double> distribution(0.0,0.01);
+  // default_random_engine generator(23);
+  // normal_distribution<double> distribution(0.0,0.01);
 
   for (int i = 0; i < p->get_row(); i++) {
     for (int j = 0; j < p->get_col(); j++) {
-      double rnd = distribution(generator);
+      double rnd = 1.0;
       p->set_value(i,j,rnd);
     }
   }
 
   for (int i = 0; i < q->get_row(); i++) {
     for (int j = 0; j < q->get_col(); j++) {
-      double rnd = distribution(generator);
+      double rnd = 1.0;
       q->set_value(i,j,rnd);
     }
   }
@@ -110,7 +110,7 @@ Svd::~Svd(){
 }
 
 double Svd::predict(int user, int item){
-  double prediction = 0;
+  double prediction = 0.0;
   for (int i = 0; i < this->factors; i++) {
     prediction += p->get_value(user,i) * q->get_value(item,i);
   }
@@ -147,7 +147,7 @@ void Svd::train_model(){
   	}
     rmse/=sum ;
     // cout << "epoca "<< e << " "<< sqrt(rmse) << endl;
-    
+
 }
 }
 
@@ -174,7 +174,6 @@ void Svd::submission(ifstream* input_targets ){
         answer=0.0;
       }
       cout << user_id << ":" << item_id<<","<<answer << endl;
-      (this->targets)[user_id] = item_id;
     }
   }
 }

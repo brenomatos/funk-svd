@@ -16,7 +16,7 @@ int main(int argc, char const *argv[]) {
   int k=50; // # of factors
   double learning_rate=0.005;
   double reg=0.8;
-  int epochs = 73;
+  int epochs = 73; //testra 23
 
   Svd svd = Svd(k,learning_rate,reg,epochs,&input_ratings);
   svd.train_model();
