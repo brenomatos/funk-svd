@@ -8,23 +8,6 @@ using namespace std;
 
 class Matrix;
 
-void Svd::print_ratings(){
-  for(auto const &ent1 : (this->dense_users)) {
-    // ent1.first is the first key
-    for(auto const &ent2 : ent1.second) {
-      cout << ent1.first << " "<< ent2.first << " "<< ent2.second<<endl;
-    }
-  }
-}
-
-void Svd::print_targets(){
-  cout << this->targets.size() << endl;
-  for(auto elem : this->targets)
-  {
-    std::cout << elem.first << " " << elem.second << " " << "\n";
-  }
-}
-
 void Svd::read_ratings(ifstream* input_ratings){
   // reading ratings file
   string line; // needed to read line by line from each file
@@ -39,15 +22,16 @@ void Svd::read_ratings(ifstream* input_ratings){
       user_id = line.substr(0,8);
       item_id = line.substr(9,8);
       // dict that keeps track of user index in p matrix
-      if ((this->user_index).find(user_id)==this->user_index.end()) {
+      if ((this->user_index).find(user_id) == this->user_index.end()) {
         (this->user_index)[user_id] = index_user;
         index_user++;
       }
       // dict that keeps track of item index in q matrix
-      if ((this->item_index).find(item_id)==this->item_index.end()) {
+      if ((this->item_index).find(item_id) == this->item_index.end()) {
         (this->item_index)[item_id] = index_item;
         index_item++;
       }
+
       // workaround: sometimes ratings have 2 digits
       if (line[19]!=',') {
         prediction = stoi(line.substr(18,2));
@@ -57,7 +41,8 @@ void Svd::read_ratings(ifstream* input_ratings){
         prediction = stoi(line.substr(18,1));
         timestamp = stoi(line.substr(20,line.size()-1));
       }
-      (this->dense_users)[user_id][item_id] = prediction;
+      this->dense_users.push_back(make_pair(make_pair(user_index[user_id], item_index[item_id]),prediction));
+      // (this->dense_users)[user_id][item_id] = prediction;
       (void) timestamp;
     }
   }
@@ -66,17 +51,19 @@ void Svd::read_targets(ifstream* input_targets ){
   string user_id, item_id, line;
   // reading targets file
   if (input_targets->is_open()) {
+    getline(*input_targets, line);
     while (getline(*input_targets, line)) {
       user_id = line.substr(0,8);
       item_id = line.substr(9,8);
-      (this->targets)[user_id] = item_id;
+      this->targets.push_back(make_pair(user_id, item_id));
+      // (this->targets)[user_id] = item_id;
     }
   }
 }
 
-Svd::Svd(int k, double learning_rate, double reg, int epochs, ifstream* input_ratings){
+Svd::Svd(int k, double learning_rate, double reg, int epochs, ifstream* input_ratings, ifstream* input_targets){
   this->read_ratings(input_ratings);
-  // this->read_targets(input_targets);
+  this->read_targets(input_targets);
   this->factors = k;
   this->learning_rate = learning_rate;
   this->reg = reg;
@@ -118,63 +105,55 @@ double Svd::predict(int user, int item){
 }
 
 void Svd::train_model(){
-	string u_id,i_id; // user and item ids
-	double rtng;
+	int u_id,i_id; // user and item ids
+	double rating;
 	double error;
   double q_correction, p_correction;
-  for (int e = 0; e < this->epochs; e++)
-  {
+  for (int i = 0; i < this->epochs; i++) {
     double rmse = 0;
-  int sum = 0;
-  	for(auto const &ent1 : (this->dense_users)) {
-    	// ent1.first is the first key
-    	for(auto const &ent2 : ent1.second) {
-	      	u_id = ent1.first;
-	      	i_id =  ent2.first;
-	      	rtng = ent2.second;
-	      	// calculating prediction error
-	      	error =  this->dense_users[u_id][i_id] - predict(this->user_index[u_id],this->item_index[i_id]);
-          rmse+=(error*error);
-          sum+=1;
-	      	// updating vectors
-	    	for (int i = 0; i < this->factors; i++) {
-          q_correction = 2*this->learning_rate*(error * p->get_value(user_index[u_id],i));
-          p_correction = 2*this->learning_rate*(error * q->get_value(item_index[i_id],i));
-	    		q->set_value(item_index[i_id],i, q->get_value(item_index[i_id],i) + q_correction);
-    			p->set_value(user_index[u_id],i, p->get_value(user_index[u_id],i) + p_correction);
-  			}
-    	}
-  	}
+    int sum = 0;
+    for (int j = 0; j < this->dense_users.size(); j++) {
+      u_id = this->dense_users[j].first.first;
+      i_id =  this->dense_users[j].first.second;
+      rating = this->dense_users[j].second;
+
+      error = rating - predict(u_id,i_id);
+      rmse+=(error*error);
+      sum+=1;
+      for (int k = 0; k < this->factors; k++) {
+        q_correction = 2*this->learning_rate*(error * p->get_value(u_id,k));
+        p_correction = 2*this->learning_rate*(error * q->get_value(i_id,k));
+        q->set_value(i_id, k, q->get_value(i_id,k) + q_correction);
+        p->set_value(u_id, k, p->get_value(u_id,k) + p_correction);
+      }
+    }
     rmse/=sum ;
-    // cout << "epoca "<< e << " "<< sqrt(rmse) << endl;
+    // cout << "epoca "<< i << " "<< sqrt(rmse) << endl;
+  }
 
 }
-}
 
-void Svd::submission(ifstream* input_targets ){
-  string user_id, item_id, line;
+void Svd::submission(){
+  string  line;
+  string u_id,i_id;
+  double answer;
   // reading targets file
   cout<< "UserId:ItemId,Prediction\n";
-  if (input_targets->is_open()) {
-    getline(*input_targets, line);
-    while (getline(*input_targets, line)) {
-      user_id = line.substr(0,8);
-      item_id = line.substr(9,8);
-      double answer = predict(user_index[user_id],item_index[item_id]);
-      if (this->user_index.find(user_id)==this->user_index.end() || this->item_index.find(item_id)==this->item_index.end() )
-      {
-        answer = 7.2;
+  for (int i = 0; i < targets.size(); i++) {
+    u_id = this->targets[i].first;
+    i_id = this->targets[i].second;
+    if (this->user_index.count(u_id) && this->item_index.count(i_id)) {
+      answer = predict(user_index[u_id],item_index[i_id]);
+      if (answer>10) {
+        answer = 10.0;
+      } else if(answer<0) {
+        answer = 0.0;
       }
-      if (answer>10)
-        {
-          answer=10.0;
-        }
-      if (answer<0)
-      {
-        answer=0.0;
-      }
-      cout << user_id << ":" << item_id<<","<<answer << endl;
     }
+    else{
+      answer = 7.2;
+    }
+    cout << u_id<< ":" << i_id<<","<<answer << endl;
   }
 }
 
