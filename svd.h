@@ -25,8 +25,6 @@ public:
   ~Svd ();
   void read_targets(ifstream* input_targets );
   void read_ratings(ifstream* input_ratings);
-  void print_ratings();
-  void print_targets();
   void train_model();
   double predict(int user, int item);//for a pair user:item, predicts a rating
   void submission();
