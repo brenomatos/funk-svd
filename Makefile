@@ -1,3 +1,5 @@
+run: all
+	./recommender ratings.csv targets.csv > submission.csv
 all: recommender
 
 recommender: matrix.o svd.o

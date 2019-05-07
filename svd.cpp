@@ -41,11 +41,13 @@ void Svd::read_ratings(ifstream* input_ratings){
         prediction = stoi(line.substr(18,1));
         timestamp = stoi(line.substr(20,line.size()-1));
       }
+      this->average_rating+=prediction;//will be used later to calculate average_rating
       this->dense_users.push_back(make_pair(make_pair(user_index[user_id], item_index[item_id]),prediction));
-      // (this->dense_users)[user_id][item_id] = prediction;
       (void) timestamp;
     }
   }
+  // calculate average rating for the whole dataset
+  this->average_rating = this->average_rating/this->dense_users.size();
 }
 void Svd::read_targets(ifstream* input_targets ){
   string user_id, item_id, line;
@@ -61,31 +63,26 @@ void Svd::read_targets(ifstream* input_targets ){
   }
 }
 
-Svd::Svd(int k, double learning_rate, double reg, int epochs, ifstream* input_ratings, ifstream* input_targets){
+Svd::Svd(int k, double learning_rate, int epochs, ifstream* input_ratings, ifstream* input_targets){
   this->read_ratings(input_ratings);
   this->read_targets(input_targets);
   this->factors = k;
   this->learning_rate = learning_rate;
-  this->reg = reg;
   this->epochs = epochs;
+
   p = new Matrix(this->user_index.size(), k);
   q = new Matrix(this->item_index.size(), k);
-  // both p and q star with random numbers following a normal distribuition
-
-  // default_random_engine generator(23);
-  // normal_distribution<double> distribution(0.0,0.01);
+  // both p and q start with 1.0
 
   for (int i = 0; i < p->get_row(); i++) {
     for (int j = 0; j < p->get_col(); j++) {
-      double rnd = 1.0;
-      p->set_value(i,j,rnd);
+      p->set_value(i,j,1.0);
     }
   }
 
   for (int i = 0; i < q->get_row(); i++) {
     for (int j = 0; j < q->get_col(); j++) {
-      double rnd = 1.0;
-      q->set_value(i,j,rnd);
+      q->set_value(i,j,1.0);
     }
   }
 
@@ -130,7 +127,6 @@ void Svd::train_model(){
     rmse/=sum ;
     // cout << "epoca "<< i << " "<< sqrt(rmse) << endl;
   }
-
 }
 
 void Svd::submission(){
@@ -151,16 +147,11 @@ void Svd::submission(){
       }
     }
     else{
-      answer = 7.2;
+      answer = this->average_rating;
     }
     cout << u_id<< ":" << i_id<<","<<answer << endl;
   }
 }
 
-void Svd::print_svd(){
-  p->print_matrix();
-  cout << endl ;
-  q->print_matrix();
-}
 
 #endif
