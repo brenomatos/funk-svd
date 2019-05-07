@@ -72,17 +72,17 @@ Svd::Svd(int k, double learning_rate, int epochs, ifstream* input_ratings, ifstr
 
   p = new Matrix(this->user_index.size(), k);
   q = new Matrix(this->item_index.size(), k);
-  // both p and q start with 1.0
+  // both p and q start with 0.2
 
   for (int i = 0; i < p->get_row(); i++) {
     for (int j = 0; j < p->get_col(); j++) {
-      p->set_value(i,j,1.0);
+      p->set_value(i,j,0.02);
     }
   }
 
   for (int i = 0; i < q->get_row(); i++) {
     for (int j = 0; j < q->get_col(); j++) {
-      q->set_value(i,j,1.0);
+      q->set_value(i,j,0.02);
     }
   }
 
